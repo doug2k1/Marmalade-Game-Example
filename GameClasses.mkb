@@ -1,0 +1,32 @@
+#!/usr/bin/env mkb
+
+# files specifies all files to build
+files
+{
+	["src"]
+	(src)
+	main.cpp
+	game.cpp
+	GameEntity.cpp
+	(h)
+	game.h
+	GameEntity.h
+}
+
+includepaths
+{
+    h
+}
+
+subprojects
+{
+	iw2d
+}
+
+assets
+{
+	(data-ram/data-gles1)
+	sprites.group.bin
+	(data)
+    birds.mp3
+}
