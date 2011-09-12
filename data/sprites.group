@@ -2,4 +2,6 @@ CIwResGroup
 { 
 	name "Sprites" 
 	"./pig.png" 
+  "./guide.png"
+  "./sonic.png"
 } 

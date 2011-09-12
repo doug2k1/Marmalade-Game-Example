@@ -23,13 +23,23 @@ CGame::CGame()
 {
 	s3eAudioPlay("birds.mp3", 0);
 	IwGetResManager()->LoadGroup("sprites.group");
-	m_Entity = new GameEntity("pig"); 
+	m_Pig = new GameEntity("pig"); 
+	m_Pig->SetCenter(CIwSVec2(50,50));
+	m_Target = new GameEntity("guide"); 
+	m_Target->SetCenter(CIwSVec2(50,50));
+	m_Target->SetPosition(CIwSVec2(480,320));
+	m_Sonic = new GameEntity("sonic");
+	m_Sonic->SetAnimated(true, CIwSVec2(4,1));
+
+	m_LastUpdate = s3eTimerGetMs();
 }
 
 
 CGame::~CGame()
 {
-	delete m_Entity;
+	delete m_Pig;
+	delete m_Target;
+	delete m_Sonic;
 	s3eAudioStop();
 }
 
@@ -37,16 +47,19 @@ CGame::~CGame()
 void CGame::Update()
 {
     // game logic goes here
+	int deltaTime = s3eTimerGetMs()- m_LastUpdate;
+	m_LastUpdate = s3eTimerGetMs();
 
     // for example, move a red square towards any touch event...
     if( s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN )
     {
         CIwFVec2 target((float)s3ePointerGetX(), (float)s3ePointerGetY());
-
         m_Position += (target - m_Position) * 0.05f;
+		m_Pig->SetPosition(CIwSVec2(m_Position.x, m_Position.y));
+		m_Target->SetRotation(IwGeomAtan2(m_Target->GetPosition().x - target.x, -m_Target->GetPosition().y + target.y) + IW_ANGLE_FROM_DEGREES(180));
     }
 
-	m_Entity->SetPosition(CIwSVec2(m_Position.x, m_Position.y));
+	m_Sonic->Update(deltaTime);
 }
 
 
@@ -63,7 +76,9 @@ void CGame::Render()
     // note conversion to pixel coordinates
     //Iw2DFillRect(CIwSVec2((iwsfixed)m_Position.x, (iwsfixed)m_Position.y) - m_Size/IW_FIXED(2), m_Size);
 
-	m_Entity->Draw();
+	m_Target->Draw();
+	m_Pig->Draw();
+	m_Sonic->Draw();
 
     // show the surface
     Iw2DSurfaceShow();

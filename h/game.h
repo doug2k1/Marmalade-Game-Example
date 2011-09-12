@@ -33,7 +33,10 @@ public:
 private:
     CIwFVec2 m_Position;
     CIwSVec2 m_Size;
-	GameEntity* m_Entity;
+	GameEntity *m_Pig;
+	GameEntity *m_Target;
+	GameEntity *m_Sonic;
+	int64 m_LastUpdate;
 };
 
 #endif
