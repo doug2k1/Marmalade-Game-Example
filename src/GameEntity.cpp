@@ -4,6 +4,7 @@
 GameEntity::GameEntity(const char* image)
 	: m_Center(0,0), 
 	m_Position(0,0),
+	m_MovSpeed(0,0),
 	m_Angle(0),
 	m_Animated(false)
 {
@@ -17,9 +18,10 @@ GameEntity::~GameEntity()
 }
 
 
-void GameEntity::SetAnimated(bool animated, CIwSVec2 frameCount)
+void GameEntity::SetAnimated(bool animated, float speed, CIwSVec2 frameCount)
 {
 	m_Animated = animated;
+	m_AnimSpeed = speed;
 
 	if (animated) 
 	{
@@ -30,30 +32,39 @@ void GameEntity::SetAnimated(bool animated, CIwSVec2 frameCount)
 }
 
 
-void GameEntity::Update(int deltaTime)
+void GameEntity::Update(float deltaTime)
 {
-	m_CurrentFrame += 0.02 * deltaTime;
+	// update animation
+	if (m_Animated) {
+		m_CurrentFrame += m_AnimSpeed * deltaTime;
 
-	if (m_CurrentFrame > (m_FrameCount.x * m_FrameCount.y)) { m_CurrentFrame = 0; }
+		if (m_CurrentFrame > (m_FrameCount.x * m_FrameCount.y)) { m_CurrentFrame = 0; }
+	}
+
+	// update position
+	m_Position += m_MovSpeed * deltaTime;
 }
 
 
 void GameEntity::Draw() 
 {
+	CIwSVec2 drawPos(m_Position.x, m_Position.y);
+	drawPos -=m_Center;
+
 	if (m_Angle != 0) {
 		CIwMat2D rotMatrix;
-		rotMatrix.SetRot(m_Angle, CIwVec2(m_Position));
+		rotMatrix.SetRot(m_Angle, CIwVec2((int32)m_Position.x, (int32)m_Position.y));
 		Iw2DSetTransformMatrix(rotMatrix);
 	}
 
 	if (m_Animated) 
 	{
 		CIwSVec2 offset(((int)m_CurrentFrame % m_FrameCount.x) * m_FrameSize.x, ((int)m_CurrentFrame / m_FrameCount.x) * m_FrameSize.y);
-		Iw2DDrawImageRegion(m_Image, m_Position - m_Center, offset, m_FrameSize);
+		Iw2DDrawImageRegion(m_Image, drawPos, offset, m_FrameSize);
 	} 
 	else
 	{
-		Iw2DDrawImage(m_Image, m_Position - m_Center);
+		Iw2DDrawImage(m_Image, drawPos);
 	}
 
 	if (m_Angle != 0) {

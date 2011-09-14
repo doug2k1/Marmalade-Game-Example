@@ -27,9 +27,10 @@ CGame::CGame()
 	m_Pig->SetCenter(CIwSVec2(50,50));
 	m_Target = new GameEntity("guide"); 
 	m_Target->SetCenter(CIwSVec2(50,50));
-	m_Target->SetPosition(CIwSVec2(480,320));
+	m_Target->SetPosition(CIwFVec2(480,320));
 	m_Sonic = new GameEntity("sonic");
-	m_Sonic->SetAnimated(true, CIwSVec2(4,1));
+	m_Sonic->SetAnimated(true, 10, CIwSVec2(4,1));
+	m_Sonic->SetMovSpeed(CIwFVec2(300,0));
 
 	m_LastUpdate = s3eTimerGetMs();
 }
@@ -49,17 +50,25 @@ void CGame::Update()
     // game logic goes here
 	int deltaTime = s3eTimerGetMs()- m_LastUpdate;
 	m_LastUpdate = s3eTimerGetMs();
+	float dtSecs = deltaTime * 0.001f;
 
     // for example, move a red square towards any touch event...
     if( s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN )
     {
         CIwFVec2 target((float)s3ePointerGetX(), (float)s3ePointerGetY());
         m_Position += (target - m_Position) * 0.05f;
-		m_Pig->SetPosition(CIwSVec2(m_Position.x, m_Position.y));
-		m_Target->SetRotation(IwGeomAtan2(m_Target->GetPosition().x - target.x, -m_Target->GetPosition().y + target.y) + IW_ANGLE_FROM_DEGREES(180));
+		m_Pig->SetPosition(m_Position);
+		m_Target->SetRotation(IwGeomAtan2(int(m_Target->GetPosition().x - target.x), int(-m_Target->GetPosition().y + target.y)) + IW_ANGLE_FROM_DEGREES(180));
     }
 
-	m_Sonic->Update(deltaTime);
+	m_Sonic->Update(dtSecs);
+
+	if (m_Sonic->GetPosition().x > 1000) 
+	{
+		m_Sonic->SetPosition(CIwFVec2(0, m_Sonic->GetPosition().y));
+	}
+
+	m_Pig->Update(dtSecs);
 }
 
 
