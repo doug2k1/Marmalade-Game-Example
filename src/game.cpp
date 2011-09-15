@@ -13,6 +13,7 @@
  * PARTICULAR PURPOSE.
  */
 #include "s3e.h"
+#include "IwGx.h"
 #include "Iw2D.h"
 #include "IwResManager.h"
 #include "game.h"
@@ -20,8 +21,18 @@
 CGame::CGame()
 : m_Position(0,0)
 , m_Size(Iw2DGetSurfaceHeight() / 10, Iw2DGetSurfaceHeight() / 10)
+, m_UpdatesPerSec(0)
+, m_TimeToOneSec(0)
+, m_CountUpdates(0)
 {
 	s3eAudioPlay("birds.mp3", 0);
+
+	// text
+	IwGetResManager()->LoadGroup("fonts.group"); 
+	m_Font = Iw2DCreateFontResource("font"); 
+	Iw2DSetFont(m_Font); 
+
+	// sprites
 	IwGetResManager()->LoadGroup("sprites.group");
 	m_Pig = new GameEntity("pig"); 
 	m_Pig->SetCenter(CIwSVec2(50,50));
@@ -38,6 +49,7 @@ CGame::CGame()
 
 CGame::~CGame()
 {
+	delete m_Font;
 	delete m_Pig;
 	delete m_Target;
 	delete m_Sonic;
@@ -48,9 +60,20 @@ CGame::~CGame()
 void CGame::Update()
 {
     // game logic goes here
-	int deltaTime = s3eTimerGetMs()- m_LastUpdate;
+	uint64 deltaTime = s3eTimerGetMs() - m_LastUpdate;
 	m_LastUpdate = s3eTimerGetMs();
 	float dtSecs = deltaTime * 0.001f;
+
+	m_TimeToOneSec += deltaTime;
+
+	if (m_TimeToOneSec >= 1000) 
+	{ 
+		m_TimeToOneSec -= 1000; 
+		m_UpdatesPerSec = m_CountUpdates;
+		m_CountUpdates = 0;
+	}
+
+	m_CountUpdates++;
 
     // for example, move a red square towards any touch event...
     if( s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN )
@@ -88,6 +111,10 @@ void CGame::Render()
 	m_Target->Draw();
 	m_Pig->Draw();
 	m_Sonic->Draw();
+	Iw2DDrawString("Game DoXan", CIwSVec2(10,10), CIwSVec2(400,100), IW_2D_FONT_ALIGN_LEFT, IW_2D_FONT_ALIGN_TOP); 
+	char buffer [50];
+	sprintf(buffer, "FPS: %d", m_UpdatesPerSec);
+	Iw2DDrawString(buffer, CIwSVec2(10,30), CIwSVec2(400,100), IW_2D_FONT_ALIGN_LEFT, IW_2D_FONT_ALIGN_TOP);
 
     // show the surface
     Iw2DSurfaceShow();

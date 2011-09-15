@@ -36,7 +36,12 @@ private:
 	GameEntity *m_Pig;
 	GameEntity *m_Target;
 	GameEntity *m_Sonic;
-	int64 m_LastUpdate;
+	CIw2DFont* m_Font;
+	uint64 m_LastUpdate;
+
+	int m_TimeToOneSec;
+	int m_CountUpdates;
+	int m_UpdatesPerSec;
 };
 
 #endif

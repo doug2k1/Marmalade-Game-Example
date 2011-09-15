@@ -27,6 +27,7 @@ assets
 {
 	(data-ram/data-gles1)
 	sprites.group.bin
+	fonts.group.bin
 	(data)
     birds.mp3
 }

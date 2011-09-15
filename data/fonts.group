@@ -1,0 +1,6 @@
+CIwResGroup 
+{ 
+	name "Fonts" 
+	"./font.gxfont"
+  "./font.tga"
+} 
