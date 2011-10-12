@@ -14,6 +14,7 @@
  */
 #include "s3e.h"
 #include "Iw2D.h"
+#include "IwSound.h"
 #include "game.h"
 
 // updates per second
@@ -32,6 +33,11 @@ int GetUpdateFrame()
 int main()
 {
 	Iw2DInit();
+	IwSoundInit();
+	#ifdef IW_BUILD_RESOURCES
+		// Tell resource system how to convert WAV files
+		IwGetResManager()->AddHandler(new CIwResHandlerWAV);
+	#endif
 
     // create game object
     CGame* pGame = new CGame;
@@ -46,23 +52,23 @@ int main()
         
         // block until the next frame (don't render unless at 
         // least one update has occurred)
-        while(!s3eDeviceCheckQuitRequest())
+        /*while(!s3eDeviceCheckQuitRequest())
         {
             nextUpdate = GetUpdateFrame();
             if( nextUpdate != currentUpdate )
                 break;
             s3eDeviceYield(1);
-        }
+        }*/
         
         // execute update steps
-        int frames = nextUpdate - currentUpdate;
+        /*int frames = nextUpdate - currentUpdate;
         frames = MIN(MAX_UPDATES, frames);
         while(frames--)
-        {
+        {*/
             pGame->Update();
-        }
+        /*}
         currentUpdate = nextUpdate;
-        
+        */
         // render the results
         pGame->Render();
 
@@ -78,6 +84,7 @@ int main()
     // clear up game object
     delete pGame;
 
+	IwSoundTerminate();
 	Iw2DTerminate();
 
 	return 0;

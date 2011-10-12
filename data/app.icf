@@ -17,3 +17,4 @@
 # S3E documentation for details.
 [S3E] 
 IOSDispScaleFactor = 200
+FixScreenOrientation = 2

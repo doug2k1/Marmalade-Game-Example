@@ -38,6 +38,7 @@ private:
 	GameEntity *m_Sonic;
 	CIw2DFont* m_Font;
 	uint64 m_LastUpdate;
+	CIwSoundSpec *m_SndExplosion;
 
 	int m_TimeToOneSec;
 	int m_CountUpdates;

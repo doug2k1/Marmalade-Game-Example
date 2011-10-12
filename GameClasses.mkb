@@ -1,5 +1,10 @@
 #!/usr/bin/env mkb
 
+options
+{
+    module_path="$MARMALADE_ROOT/examples"
+}
+
 # files specifies all files to build
 files
 {
@@ -21,13 +26,22 @@ includepaths
 subprojects
 {
 	iw2d
+	SoundEngine
 }
 
 assets
 {
-	(data-ram/data-gles1)
-	sprites.group.bin
-	fonts.group.bin
 	(data)
     birds.mp3
+	(data-ram/data-gles1, data)
+	sprites.group.bin
+	fonts.group.bin
+	sounds.group.bin
+}
+#### AUTO GENERATED deployment settings from DeployTool.exe. Do not edit below this line ####
+deployments
+{
+	["Default"]
+	caption='Game Test'
+	splashscreen-auto-onblack='1'
 }

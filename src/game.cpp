@@ -16,6 +16,7 @@
 #include "IwGx.h"
 #include "Iw2D.h"
 #include "IwResManager.h"
+#include "IwSound.h"
 #include "game.h"
 
 CGame::CGame()
@@ -26,6 +27,8 @@ CGame::CGame()
 , m_CountUpdates(0)
 {
 	s3eAudioPlay("birds.mp3", 0);
+
+	m_SndExplosion = (CIwSoundSpec*)IwGetResManager()->LoadGroup("sounds.group")->GetResNamed("explosion", IW_SOUND_RESTYPE_SPEC);
 
 	// text
 	IwGetResManager()->LoadGroup("fonts.group"); 
@@ -40,8 +43,8 @@ CGame::CGame()
 	m_Target->SetCenter(CIwSVec2(50,50));
 	m_Target->SetPosition(CIwFVec2(480,320));
 	m_Sonic = new GameEntity("sonic");
-	m_Sonic->SetAnimated(true, 10, CIwSVec2(4,1));
-	m_Sonic->SetMovSpeed(CIwFVec2(300,0));
+	m_Sonic->SetAnimated(true, 15, CIwSVec2(4,1));
+	m_Sonic->SetMovSpeed(CIwFVec2(600,0));
 
 	m_LastUpdate = s3eTimerGetMs();
 }
@@ -79,19 +82,27 @@ void CGame::Update()
     if( s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN )
     {
         CIwFVec2 target((float)s3ePointerGetX(), (float)s3ePointerGetY());
-        m_Position += (target - m_Position) * 0.05f;
+        m_Position += (target - m_Position) * 5 * dtSecs;
 		m_Pig->SetPosition(m_Position);
 		m_Target->SetRotation(IwGeomAtan2(int(m_Target->GetPosition().x - target.x), int(-m_Target->GetPosition().y + target.y)) + IW_ANGLE_FROM_DEGREES(180));
-    }
+	}
+
+	if( s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED )
+	{
+		m_SndExplosion->Play();
+	}
 
 	m_Sonic->Update(dtSecs);
 
-	if (m_Sonic->GetPosition().x > 1000) 
+	if (m_Sonic->GetPosition().x > 1000)  
 	{
 		m_Sonic->SetPosition(CIwFVec2(0, m_Sonic->GetPosition().y));
 	}
 
 	m_Pig->Update(dtSecs);
+
+	// Update Iw Sound Manager
+	IwGetSoundManager()->Update();
 }
 
 
@@ -111,7 +122,7 @@ void CGame::Render()
 	m_Target->Draw();
 	m_Pig->Draw();
 	m_Sonic->Draw();
-	Iw2DDrawString("Game DoXan", CIwSVec2(10,10), CIwSVec2(400,100), IW_2D_FONT_ALIGN_LEFT, IW_2D_FONT_ALIGN_TOP); 
+	Iw2DDrawString("Game Test", CIwSVec2(10,10), CIwSVec2(400,100), IW_2D_FONT_ALIGN_LEFT, IW_2D_FONT_ALIGN_TOP); 
 	char buffer [50];
 	sprintf(buffer, "FPS: %d", m_UpdatesPerSec);
 	Iw2DDrawString(buffer, CIwSVec2(10,30), CIwSVec2(400,100), IW_2D_FONT_ALIGN_LEFT, IW_2D_FONT_ALIGN_TOP);
